@@ -1,0 +1,12 @@
+{
+    "service": {
+        "name": "testserver",
+        "address": "nginx1",
+        "port": 80,
+        "check": {
+            "args": ["curl", "nginx1"],
+            "interval": "10s"
+        },
+        "tags": ["nginx", "webserver"]
+    }
+}

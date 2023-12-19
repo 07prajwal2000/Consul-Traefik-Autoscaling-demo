@@ -1,0 +1,1 @@
+sudo docker run --rm --network testnet --name consul -v ./consul_cfg:/etc/consul -p 8500:8500 -p 8600:8600 -p 3210:80 hashicorp/consul agent -server -dev -enable-script-checks -ui -node=server -bind=0.0.0.0 -config-dir=/etc/consul -client=0.0.0.0 -http-port=80
