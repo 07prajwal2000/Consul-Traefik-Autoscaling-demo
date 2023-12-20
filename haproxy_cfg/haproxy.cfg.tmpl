@@ -1,6 +1,6 @@
 global
     stats socket ipv4@*:9999 level admin
-    stats timeout 2m
+    stats timeout 10s
 
 defaults
    timeout connect 5s
@@ -20,5 +20,7 @@ frontend fe
    default_backend be_lb
 
 backend be_lb
-   balance roundrobin
-   server webapp webapp:3001
+    balance roundrobin{{range service "goapp"}}
+    server {{.Node}} {{.Address}}:{{.Port}}
+    {{end}}
+

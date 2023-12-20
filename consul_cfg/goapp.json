@@ -1,0 +1,12 @@
+{
+    "service": {
+        "name": "goapp",
+        "address": "webapp",
+        "port": 3001,
+        "check": {
+            "args": ["curl", "webapp:3001"],
+            "interval": "20s"
+        },
+        "tags": ["goapp", "api"]
+    }
+}

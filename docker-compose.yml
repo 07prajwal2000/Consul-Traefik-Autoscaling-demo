@@ -1,27 +1,51 @@
 version: '3.0'
 
 services:
-  haproxyapp:
+  consul-template:
+    image: hashicorp/consul-template:0.35
+    container_name: "consul-template"
+    volumes:
+      - ./haproxy_cfg:/data
+    command: -consul-addr consul:80 -template "/data/haproxy.cfg.tmpl:/data/haproxy_gen.cfg"
+    depends_on:
+      - consul
+    networks:
+      - testnet
+  haproxy:
     image: haproxy:latest
+    container_name: haproxy
+    depends_on:
+      - webapp
+      - consul-template
+    networks:
+      - testnet
     ports:
-      - 3000:8080
+      - 1936:1936
+      - 8080:8080
       - 9999:9999
     volumes:
-      - ./test.cfg:/usr/local/etc/haproxy/haproxy.cfg
-  app1:
+      - ./haproxy_cfg/haproxy_gen.cfg:/usr/local/etc/haproxy/haproxy.cfg
+  consul:
+    image: hashicorp/consul:1.15
+    container_name: consul
+    volumes:
+      - ./consul_cfg:/etc/consul
+    ports:
+      - 8500:8500
+      - 8600:8600
+      - 3210:80
+    command: agent -server -dev -enable-script-checks -ui -node=server -bind=0.0.0.0 -config-dir=/etc/consul -client=0.0.0.0 -http-port=80
+    networks:
+      - testnet
+  webapp:
     image: testapp
+    container_name: webapp
+    networks:
+      - testnet
     environment:
       - PORT=3001
       - APP_ID="test app1"
-  app2:
-    image: testapp
-    environment:
-      - PORT=3001
-      - APP_ID="test app2"
-  app3:
-    image: testapp
-    environment:
-      - PORT=3001
-      - APP_ID="test app3"
 
-      # echo "<h2>hello server 1</h2>" > index.html
+networks:
+  testnet:
+    driver: bridge
