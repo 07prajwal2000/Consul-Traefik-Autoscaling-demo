@@ -1,38 +1,29 @@
 version: '3.0'
 
 services:
-  consul-template:
-    image: hashicorp/consul-template:0.35
-    container_name: "consul-template"
-    volumes:
-      - ./haproxy_cfg:/data
-    command: -consul-addr consul:80 -template "/data/haproxy.cfg.tmpl:/data/haproxy_gen.cfg"
-    depends_on:
-      - consul
+  traefik:
+    image: traefik:latest
+    container_name: traefik
     networks:
       - testnet
-  haproxy:
-    image: haproxy:latest
-    container_name: haproxy
-    depends_on:
-      - webapp
-      - consul-template
-    networks:
-      - testnet
+    command: 
+    - "--providers.consulcatalog=true"
+    - "--providers.consulcatalog.endpoint.address=consul:80"
+    - "--api.dashboard=true"
+    - "--api.insecure=true"
+    - "--log.level=DEBUG"
     ports:
-      - 1936:1936
-      - 8080:8080
-      - 9999:9999
-    volumes:
-      - ./haproxy_cfg/haproxy_gen.cfg:/usr/local/etc/haproxy/haproxy.cfg
+      - 8080:80
+      - 8081:8080
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.localhost`)"
   consul:
     image: hashicorp/consul:1.15
     container_name: consul
     volumes:
       - ./consul_cfg:/etc/consul
     ports:
-      - 8500:8500
-      - 8600:8600
       - 3210:80
     command: agent -server -dev -enable-script-checks -ui -node=server -bind=0.0.0.0 -config-dir=/etc/consul -client=0.0.0.0 -http-port=80
     networks:
@@ -40,12 +31,25 @@ services:
   webapp:
     image: testapp
     container_name: webapp
+    depends_on:
+      - traefik
     networks:
       - testnet
     environment:
       - PORT=3001
-      - APP_ID="test app1"
+      - "APP_ID=test app1"
+  webapp2:
+    image: testapp
+    container_name: webapp2
+    depends_on:
+      - traefik
+    networks:
+      - testnet
+    environment:
+      - PORT=3001
+      - "APP_ID=test app2"
 
 networks:
   testnet:
     driver: bridge
+    external: true

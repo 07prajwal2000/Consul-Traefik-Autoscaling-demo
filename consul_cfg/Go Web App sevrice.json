@@ -1,0 +1,38 @@
+{
+	"services": [
+		{
+            "id": "app1",
+			"name": "Go Web App",
+			"address": "webapp",
+			"port": 3001,
+			"check": {
+				"args": ["curl", "webapp:3001"],
+				"interval": "20s"
+			},
+			"tags": [
+				"goapp",
+				"api",
+				"traefik.enable=true",
+				"traefik.http.routers.goapp.rule=Host(`app.localhost`)",
+				"traefik.http.services.goapp.loadbalancer.server.port=3001"
+			]
+		},
+		{
+            "id": "app2",
+			"name": "Go Web App",
+			"address": "webapp2",
+			"port": 3001,
+			"check": {
+				"args": ["curl", "webapp2:3001"],
+				"interval": "20s"
+			},
+			"tags": [
+				"goapp",
+				"api",
+				"traefik.enable=true",
+				"traefik.http.routers.goapp.rule=Host(`app.localhost`)",
+				"traefik.http.services.goapp.loadbalancer.server.port=3001"
+			]
+		}
+	]
+}

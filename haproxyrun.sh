@@ -1,1 +1,0 @@
-sudo docker run --name haproxyapp --rm --network testnet -p 8088:8080 -p 1936:1936 -v ./haproxyconsul.cfg:/usr/local/etc/haproxy/haproxy.cfg haproxy:latest
