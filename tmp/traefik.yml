@@ -1,0 +1,12 @@
+entryPoints:
+  http:
+    address: ":80"
+
+api:
+  dashboard: true
+  insecure: true
+
+providers:
+  file:
+    filename:  "/data/traefik_file.yml"
+    watch: true

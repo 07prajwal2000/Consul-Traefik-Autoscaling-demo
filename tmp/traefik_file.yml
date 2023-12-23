@@ -1,0 +1,13 @@
+http:
+  routers:
+    goApp:
+      entryPoints:
+        - http
+      service: goService
+      rule: Host(`app.localhost`)
+  services:
+    goService:
+      loadBalancer:
+        servers:
+          - url: "http://goapp1:3001"
+          - url: "http://goapp2:3001"
